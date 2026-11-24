@@ -8,11 +8,15 @@ type Plan = { name: string; price: number; features: string[] };
 export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch("/api/plans")
       .then((r) => r.json())
-      .then(setPlans);
+      .then(setPlans)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -21,12 +25,12 @@ export default function PricingPage() {
         className="relative overflow-hidden px-[13px] py-[37px] text-center"
         style={{ background: "linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #f59e0b 100%)" }}
       >
-        <div className="absolute inset-0 animate-pulse bg-white/10 blur-3xl" />
+        <div className="absolute inset-0 motion-safe:animate-pulse bg-white/10 blur-3xl" />
         <h1 className="text-[46px] font-extrabold text-white drop-shadow-[0_0_25px_rgba(255,255,255,0.8)]">
           Supercharge your workflow with AI-powered invoicing ✨
         </h1>
         <h3 className="mt-[18px] text-[15px] text-white/60">
-          Lorem ipsum dolor sit amet, the future of billing is here.
+          Simple, transparent pricing. No hidden fees, cancel any time.
         </h3>
         <div className="mt-[22px] flex justify-center gap-[10px]">
           <button className="rounded-[10px] bg-white px-[18px] py-[9px] font-bold text-black">Get Started</button>
@@ -35,17 +39,25 @@ export default function PricingPage() {
       </section>
 
       <div className="fixed right-4 top-4 z-[9999]">
-        <div onClick={() => window.scrollTo({ top: 0 })} className="h-5 w-5 cursor-pointer rounded-full bg-[#6366f1]">
-          <svg viewBox="0 0 16 16" className="h-5 w-5 fill-white">
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scroll to top"
+          className="h-5 w-5 cursor-pointer rounded-full bg-[#6366f1]"
+        >
+          <svg viewBox="0 0 16 16" className="h-5 w-5 fill-white" aria-hidden="true">
             <path d="M8 3l5 6H3z" />
           </svg>
-        </div>
+        </button>
       </div>
 
       <section className="mx-auto grid max-w-5xl grid-cols-3 gap-[14px] p-[26px]">
-        {plans.map((plan) => (
-          <PlanCard key={plan.name} plan={plan} />
-        ))}
+        {loading && <p className="col-span-3 text-center text-gray-500">Loading plans…</p>}
+        {error && (
+          <p className="col-span-3 text-center text-red-500">
+            Could not load plans. <button onClick={() => window.location.reload()}>Retry</button>
+          </p>
+        )}
+        {!loading && !error && plans.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
       </section>
 
       <section className="mx-auto max-w-md p-[26px]">
@@ -62,10 +74,11 @@ export default function PricingPage() {
           />
           <button
             onClick={() => fetch("/api/subscribe", { method: "POST", body: email })}
+            aria-label="Subscribe"
             className="rounded-[7px] px-[11px] text-[14px] text-white outline-none transition-all duration-700"
             style={{ backgroundColor: "#22c55e" }}
           >
-            <svg viewBox="0 0 16 16" className="h-4 w-4 fill-current">
+            <svg viewBox="0 0 16 16" className="h-4 w-4 fill-current" aria-hidden="true">
               <path d="M2 8h10M8 4l4 4-4 4" stroke="currentColor" />
             </svg>
           </button>

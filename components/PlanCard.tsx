@@ -5,7 +5,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
     <div className="rounded-[14px] border border-gray-200 bg-white p-[22px] shadow-[0_8px_30px_rgba(124,58,237,0.35)] transition-all hover:scale-105">
       <h4 className="text-[17px] font-bold text-[#111827]">{plan.name}</h4>
       <div className="mt-[10px] text-[38px] font-black text-[#6366f1]">${plan.price}</div>
-      <ul className="mt-[14px] space-y-[6px] text-[13px] text-gray-400">
+      <ul className="mt-[14px] space-y-[6px] text-[13px] text-gray-600">
         {plan.features.map((f) => (
           <li key={f}>✅ {f}</li>
         ))}
